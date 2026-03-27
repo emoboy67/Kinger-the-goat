@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinger's Digital Collection</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: none; /* Hide cursor to use Kinger instead */
+        }
+
+        /* The Glitchy Circus Floor */
+        #circus {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 50px 50px;
+            opacity: 0.5;
+        }
+
+        /* Kinger character */
+        #kinger {
+            position: absolute;
+            font-size: 70px;
+            pointer-events: none;
+            z-index: 100;
+            filter: drop-shadow(0 0 10px #fff);
+            transition: transform 0.1s;
+        }
+
+        /* Falling Computers */
+        .computer {
+            position: absolute;
+            font-size: 40px;
+            user-select: none;
+            z-index: 50;
+        }
+
+        /* Score UI */
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #0f0;
+            font-size: 24px;
+            z-index: 200;
+            text-shadow: 2px 2px #000;
+        }
+
+        .shake {
+            animation: shake 0.2s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            50% { transform: translate(-1px, -2px) rotate(-1deg); }
+            100% { transform: translate(1px, 2px) rotate(1deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui">COMPUTERS COLLECTED: <span id="score">0</span></div>
+    <div id="circus"></div>
+    <div id="kinger" class="shake">👑</div>
+
+    <script>
+        const kinger = document.getElementById('kinger');
+        const scoreElement = document.getElementById('score');
+        let score = 0;
+
+        // Move Kinger with mouse
+        window.addEventListener('mousemove', (e) => {
+            kinger.style.left = (e.clientX - 35) + 'px';
+            kinger.style.top = (e.clientY - 35) + 'px';
+        });
+
+        function createComputer() {
+            const computer = document.createElement('div');
+            computer.className = 'computer';
+            computer.innerHTML = '💻';
+            computer.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+            computer.style.top = '-50px';
+            document.body.appendChild(computer);
+
+            let fallSpeed = 3 + Math.random() * 5;
+            let rotation = 0;
+
+            function fall() {
+                let top = parseFloat(computer.style.top);
+                computer.style.top = (top + fallSpeed) + 'px';
+                rotation += 5;
+                computer.style.transform = `rotate(${rotation}deg)`;
+
+                // Collision detection
+                const kRect = kinger.getBoundingClientRect();
+                const cRect = computer.getBoundingClientRect();
+
+                if (
+                    cRect.left < kRect.right &&
+                    cRect.right > kRect.left &&
+                    cRect.top < kRect.bottom &&
+                    cRect.bottom > kRect.top
+                ) {
+                    score++;
+                    scoreElement.innerText = score;
+                    computer.remove();
+                    return;
+                }
+
+                // Remove if it falls off screen
+                if (top > window.innerHeight) {
+                    computer.remove();
+                } else {
+                    requestAnimationFrame(fall);
+                }
+            }
+            requestAnimationFrame(fall);
+        }
+
+        // Spawn computers frantically
+        setInterval(createComputer, 800);
+
+    </script>
+</body>
+</html>
