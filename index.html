@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheep Adventure Land</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Keeps the sheep from causing scrollbars */
+            background-color: #87CEEB; /* Sky blue */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* The Meadow */
+        #land {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(to bottom, #7cfc00, #228b22);
+            border-top: 5px solid #556b2f;
+        }
+
+        /* The Sheep */
+        #sheep {
+            position: absolute;
+            font-size: 50px;
+            user-select: none;
+            transition: transform 0.2s ease; /* Smooth turning */
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        /* Cute clouds */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+        }
+
+        .instruction {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="instruction">
+        <h1>Sheep Meadow</h1>
+        <p>Click anywhere to move the sheep!</p>
+    </div>
+
+    <div id="land"></div>
+    <div id="sheep">🐑</div>
+
+    <div class="cloud" style="width: 100px; height: 40px; top: 50px; left: 10%;"></div>
+    <div class="cloud" style="width: 150px; height: 60px; top: 100px; left: 60%;"></div>
+
+    <script>
+        const sheep = document.getElementById('sheep');
+        const land = document.getElementById('land');
+
+        // Starting position
+        let posX = window.innerWidth / 2;
+        let posY = window.innerHeight * 0.7;
+        
+        // Update sheep position visually
+        function updatePosition() {
+            sheep.style.left = `${posX}px`;
+            sheep.style.top = `${posY}px`;
+        }
+
+        updatePosition();
+
+        // Move sheep on click
+        window.addEventListener('click', (e) => {
+            const targetX = e.clientX - 25; // Offset for emoji size
+            const targetY = e.clientY - 25;
+
+            // Flip the sheep based on direction
+            if (targetX < posX) {
+                sheep.style.transform = 'scaleX(-1)'; // Facing left
+            } else {
+                sheep.style.transform = 'scaleX(1)'; // Facing right
+            }
+
+            // Animate to the new spot
+            posX = targetX;
+            posY = targetY;
+
+            // Restrict movement so it stays mostly on the green land
+            const horizon = window.innerHeight * 0.4;
+            if (posY < horizon) posY = horizon;
+
+            sheep.style.transition = "all 1s ease-out";
+            updatePosition();
+        });
+
+        // Little "idle" bounce
+        setInterval(() => {
+            sheep.style.marginTop = (parseInt(sheep.style.marginTop) === 5 ? "0px" : "5px");
+        }, 500);
+
+    </script>
+</body>
+</html>
